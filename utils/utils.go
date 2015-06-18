@@ -80,3 +80,15 @@ func BoolToString(boolean bool) string {
 func Int64ToString(i int64) string {
 	return strconv.FormatInt(i, 10)
 }
+
+func IsDirExists(path string) bool {
+	fi, err := os.Stat(path)
+
+	if err != nil {
+		return os.IsExist(err)
+	} else {
+		return fi.IsDir()
+	}
+
+	panic("not reached")
+}

@@ -3,7 +3,6 @@ package db
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -50,28 +49,4 @@ func GeneralDBKey(key string) string {
 	h := md5.New()
 	h.Write([]byte(md5String))
 	return hex.EncodeToString(h.Sum(nil))
-}
-
-func SaveObject(object interface{}, key string) error {
-	if json, err := json.Marshal(object); err != nil {
-		return err
-	} else {
-		if err := Client.Set(string(json), key, 0).Err(); err != nil {
-			return err
-		} else {
-			return nil
-		}
-	}
-}
-
-func LoadObject(object interface{}, key string) error {
-	if value, err := Client.Get(key).Result(); err != nil {
-		return err
-	} else {
-		if err := json.Unmarshal([]byte(value), object); err != nil {
-			return err
-		} else {
-			return nil
-		}
-	}
 }
