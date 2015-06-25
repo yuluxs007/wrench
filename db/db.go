@@ -5,9 +5,9 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"time"
-
 	"gopkg.in/redis.v3"
+	"strings"
+	"time"
 )
 
 const (
@@ -52,26 +52,66 @@ func GeneralDBKey(key string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func SaveObject(object interface{}, key string) error {
-	if json, err := json.Marshal(object); err != nil {
-		return err
+func GetUUID(ObjectType, Object string) (UUID string, err error) {
+
+	index := ""
+
+	switch strings.TrimSpace(ObjectType) {
+
+	case "user":
+		index = GLOBAL_USER_INDEX
+	case "repository":
+		index = GLOBAL_REPOSITORY_INDEX
+	case "organization":
+		index = GLOBAL_ORGANIZATION_INDEX
+	case "team":
+		index = GLOBAL_TEAM_INDEX
+	case "image":
+		index = GLOBAL_IMAGE_INDEX
+	case "tarsum":
+		index = GLOBAL_TARSUM_INDEX
+	case "tag":
+		index = GLOBAL_TAG_INDEX
+	case "compose":
+		index = GLOBAL_COMPOSE_INDEX
+	case "admin":
+		index = GLOBAL_ADMIN_INDEX
+	case "log":
+		index = GLOBAL_LOG_INDEX
+	default:
+
+	}
+
+	if UUID, err = Client.HGet(index, Object).Result(); err != nil {
+		return "", err
 	} else {
-		if err := Client.Set(string(json), key, 0).Err(); err != nil {
-			return err
-		} else {
-			return nil
-		}
+		return UUID, nil
 	}
 }
 
-func LoadObject(object interface{}, key string) error {
-	if value, err := Client.Get(key).Result(); err != nil {
+func Save(obj interface{}, key string) (err error) {
+
+	result, err := json.Marshal(&obj)
+	if err != nil {
 		return err
-	} else {
-		if err := json.Unmarshal([]byte(value), object); err != nil {
-			return err
-		} else {
-			return nil
-		}
 	}
+
+	if _, err := Client.Set(key, string(result), 0).Result(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Get(obj interface{}, key string) (err error) {
+	result, err := Client.Get(key).Result()
+	if err != nil {
+		return err
+	}
+
+	if err = json.Unmarshal([]byte(result), &obj); err != nil {
+		return err
+	}
+
+	return nil
 }

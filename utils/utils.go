@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -50,33 +49,14 @@ func DecodeBasicAuth(authorization string) (username string, password string, er
 	return username, password, nil
 }
 
-func StringToBool(value string) bool {
-	if boolean, _ := strconv.ParseBool(value); boolean == true {
-		return true
-	} else if boolean == false {
-		return false
-	} else {
-		return false
-	}
-}
+func IsDirExists(path string) bool {
+	fi, err := os.Stat(path)
 
-func StringToInt64(value string) int64 {
-	retval, err := strconv.ParseInt(value, 0, 64)
 	if err != nil {
-		fmt.Println("err:=", err)
-		return 0
-	}
-	return retval
-}
-
-func BoolToString(boolean bool) string {
-	if boolean == true {
-		return "true"
+		return os.IsExist(err)
 	} else {
-		return "false"
+		return fi.IsDir()
 	}
-}
 
-func Int64ToString(i int64) string {
-	return strconv.FormatInt(i, 10)
+	panic("not reached")
 }
