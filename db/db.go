@@ -1,12 +1,7 @@
 package db
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
-	"fmt"
-	"strings"
-	"time"
 
 	"gopkg.in/redis.v3"
 )
