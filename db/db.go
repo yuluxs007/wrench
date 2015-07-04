@@ -5,9 +5,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"gopkg.in/redis.v3"
 	"strings"
 	"time"
+
+	"gopkg.in/redis.v3"
 )
 
 const (
@@ -21,11 +22,22 @@ const (
 	GLOBAL_USER_INDEX         = "GLOBAL_USER_INDEX"
 	GLOBAL_ORGANIZATION_INDEX = "GLOBAL_ORGANIZATION_INDEX"
 	GLOBAL_TEAM_INDEX         = "GLOBAL_TEAM_INDEX"
-	GLOBAL_PRIVILEGE_INDEX    = "GLOBAL_PRIVILEGE_INDEX"
-
+	//Wharf Data Index
 	GLOBAL_ADMIN_INDEX = "GLOBAL_ADMIN_INDEX"
 	GLOBAL_LOG_INDEX   = "GLOBAL_LOG_INDEX"
 )
+
+/*
+  [user] : USER-(username)
+	[organization] : ORG-(org)
+	[team] : TEAM-(org)-(team)
+	[repository] : REPO-(namespace)-(repo)
+	[image] : IMAGE-(imageId)
+	[tag] : TAG-(namespace)-(repo)-(tag)
+	[compose] : COMPOSE-(namespace)-(compose)
+	[admin] : ADMIN-(username)
+	[log] : LOG-(object)
+*/
 
 var (
 	Client *redis.Client
@@ -45,52 +57,7 @@ func InitDB(addr, passwd string, db int64) error {
 	}
 }
 
-func GeneralDBKey(key string) string {
-	md5String := fmt.Sprintf("%s%d", key, time.Now().Unix())
-	h := md5.New()
-	h.Write([]byte(md5String))
-	return hex.EncodeToString(h.Sum(nil))
-}
-
-func GetUUID(ObjectType, Object string) (UUID string, err error) {
-
-	index := ""
-
-	switch strings.TrimSpace(ObjectType) {
-
-	case "user":
-		index = GLOBAL_USER_INDEX
-	case "repository":
-		index = GLOBAL_REPOSITORY_INDEX
-	case "organization":
-		index = GLOBAL_ORGANIZATION_INDEX
-	case "team":
-		index = GLOBAL_TEAM_INDEX
-	case "image":
-		index = GLOBAL_IMAGE_INDEX
-	case "tarsum":
-		index = GLOBAL_TARSUM_INDEX
-	case "tag":
-		index = GLOBAL_TAG_INDEX
-	case "compose":
-		index = GLOBAL_COMPOSE_INDEX
-	case "admin":
-		index = GLOBAL_ADMIN_INDEX
-	case "log":
-		index = GLOBAL_LOG_INDEX
-	default:
-
-	}
-
-	if UUID, err = Client.HGet(index, Object).Result(); err != nil {
-		return "", err
-	} else {
-		return UUID, nil
-	}
-}
-
 func Save(obj interface{}, key string) (err error) {
-
 	result, err := json.Marshal(&obj)
 	if err != nil {
 		return err
