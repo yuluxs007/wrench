@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -59,4 +60,20 @@ func IsDirExists(path string) bool {
 	}
 
 	panic("not reached")
+}
+
+func ValidatePassword(password string) error {
+	if valida, _ := regexp.MatchString("[:alpha:]", password); valida != true {
+		return fmt.Errorf("No alpha character in the password.")
+	}
+
+	if valida, _ := regexp.MatchString("[:digit:]", password); valida != true {
+		return fmt.Errorf("No digital character in the password.")
+	}
+
+	if len(password) < 5 || len(password) > 30 {
+		return fmt.Errorf("Password characters length should be between 5 - 30.")
+	}
+
+	return nil
 }
