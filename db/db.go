@@ -2,6 +2,7 @@ package db
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"gopkg.in/redis.v3"
 )
@@ -32,11 +33,39 @@ const (
 	[compose] : COMPOSE-(namespace)-(compose)
 	[admin] : ADMIN-(username)
 	[log] : LOG-(object)
+	[lock] : LOCK-(object)
 */
 
 var (
 	Client *redis.Client
 )
+
+func Key(object string, keys ...string) string {
+	switch object {
+	case "USER" || "user":
+		return fmt.Sprint("USER-%s", keys[0])
+	case "ORG" || "ORGANIZATION" || "org" || "organization":
+		return fmt.Sprintf("ORG-%s", keys[0])
+	case "TEAM" || "team":
+		return fmt.Sprintf("ORG-%s-%s", keys[0], keys[1])
+	case "REPO" || "REPOSITORY" || "repo" || "repository":
+		return fmt.Sprintf("REPO-%s-%s", keys[0], keys[1])
+	case "IMAGE" || "image":
+		return fmt.Sprintf("IMAGE-%s", keys[0])
+	case "TAG" || "tag":
+		return fmt.Sprintf("TAG-%s-%s-%s", keys[0], keys[1], keys[2])
+	case "COMPOSE" || "compose":
+		return fmt.Sprintf("COMPOSE-%s-%s", keys[0]-kyes[1])
+	case "ADMIN" || "admin":
+		return fmt.Sprintf("ADMIN-%s", keys[0])
+	case "LOG" || "log":
+		return fmt.Sprintf("LOG-%s", keys[0])
+	case "LOCK" || "lock":
+		return fmt.Sprintf("LOCK-%s", keys[0])
+	default:
+		return ""
+	}
+}
 
 func InitDB(addr, passwd string, db int64) error {
 	Client = redis.NewClient(&redis.Options{
