@@ -40,31 +40,47 @@ var (
 	Client *redis.Client
 )
 
-func Key(object string, keys ...string) string {
+func Key(object string, keys ...string) (result string) {
 	switch object {
-	case "USER" || "user":
-		return fmt.Sprint("USER-%s", keys[0])
-	case "ORG" || "ORGANIZATION" || "org" || "organization":
-		return fmt.Sprintf("ORG-%s", keys[0])
-	case "TEAM" || "team":
-		return fmt.Sprintf("ORG-%s-%s", keys[0], keys[1])
-	case "REPO" || "REPOSITORY" || "repo" || "repository":
-		return fmt.Sprintf("REPO-%s-%s", keys[0], keys[1])
-	case "IMAGE" || "image":
-		return fmt.Sprintf("IMAGE-%s", keys[0])
-	case "TAG" || "tag":
-		return fmt.Sprintf("TAG-%s-%s-%s", keys[0], keys[1], keys[2])
-	case "COMPOSE" || "compose":
-		return fmt.Sprintf("COMPOSE-%s-%s", keys[0]-kyes[1])
-	case "ADMIN" || "admin":
-		return fmt.Sprintf("ADMIN-%s", keys[0])
-	case "LOG" || "log":
-		return fmt.Sprintf("LOG-%s", keys[0])
-	case "LOCK" || "lock":
-		return fmt.Sprintf("LOCK-%s", keys[0])
+	case "USER":
+	case "user":
+		result = fmt.Sprint("USER-%s", keys[0])
+	case "ORG":
+	case "ORGANIZATION":
+	case "org":
+	case "organization":
+		result = fmt.Sprintf("ORG-%s", keys[0])
+	case "TEAM":
+	case "team":
+		result = fmt.Sprintf("ORG-%s-%s", keys[0], keys[1])
+	case "REPO":
+	case "REPOSITORY":
+	case "repo":
+	case "repository":
+		result = fmt.Sprintf("REPO-%s-%s", keys[0], keys[1])
+	case "IMAGE":
+	case "image":
+		result = fmt.Sprintf("IMAGE-%s", keys[0])
+	case "TAG":
+	case "tag":
+		result = fmt.Sprintf("TAG-%s-%s-%s", keys[0], keys[1], keys[2])
+	case "COMPOSE":
+	case "compose":
+		result = fmt.Sprintf("COMPOSE-%s-%s", keys[0], keys[1])
+	case "ADMIN":
+	case "admin":
+		result = fmt.Sprintf("ADMIN-%s", keys[0])
+	case "LOG":
+	case "log":
+		result = fmt.Sprintf("LOG-%s", keys[0])
+	case "LOCK":
+	case "lock":
+		result = fmt.Sprintf("LOCK-%s", keys[0])
 	default:
-		return ""
+		result = ""
 	}
+
+	return result
 }
 
 func InitDB(addr, passwd string, db int64) error {
