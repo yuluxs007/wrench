@@ -28,7 +28,7 @@ func SetConfig(path string) error {
 
 	conf, err = config.NewConfig("ini", path)
 	if err != nil {
-		fmt.Errorf("Read conf/crew.conf error: %v", err.Error())
+		fmt.Errorf("Read %s error: %v", path, err.Error())
 	}
 
 	if appname := conf.String("appname"); appname != "" {
