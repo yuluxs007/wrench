@@ -21,6 +21,7 @@ var (
 	DBURI         string
 	DBPasswd      string
 	DBDB          int64
+	BackendDriver string //Container image storage driver name
 )
 
 func SetConfig(path string) error {
@@ -102,6 +103,12 @@ func SetConfig(path string) error {
 	}
 
 	DBDB, err = conf.Int64("db::db")
+
+	if backenddriver := conf.String("backend::driver"); backenddriver != "" {
+		BackendDriver = backenddriver
+	} else if backenddriver == "" {
+		err = fmt.Errorf("BackendDriver config value is null")
+	}
 
 	return err
 }
