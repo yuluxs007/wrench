@@ -44,7 +44,7 @@ func Key(object string, keys ...string) (result string) {
 	switch object {
 	case "USER":
 	case "user":
-		result = fmt.Sprint("USER-%s", keys[0])
+		result = fmt.Sprintf("USER-%s", keys[0])
 	case "ORG":
 	case "ORGANIZATION":
 	case "org":
