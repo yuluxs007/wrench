@@ -99,6 +99,7 @@ func InitDB(addr, passwd string, db int64) error {
 
 func Save(obj interface{}, key string) (err error) {
 	result, err := json.Marshal(&obj)
+
 	if err != nil {
 		return err
 	}
@@ -112,6 +113,7 @@ func Save(obj interface{}, key string) (err error) {
 
 func Get(obj interface{}, key string) (err error) {
 	result, err := Client.Get(key).Result()
+
 	if err != nil {
 		return err
 	}

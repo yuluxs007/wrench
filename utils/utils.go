@@ -1,11 +1,14 @@
 package utils
 
 import (
+	"crypto/md5"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"regexp"
 	"strings"
+	"time"
 )
 
 func Exist(filename string) bool {
@@ -76,4 +79,12 @@ func ValidatePassword(password string) error {
 	}
 
 	return nil
+}
+
+func MD5(key string) string {
+	md5String := fmt.Sprintf("%s%d", key, time.Now().Unix())
+	h := md5.New()
+	h.Write([]byte(md5String))
+
+	return hex.EncodeToString(h.Sum(nil))
 }
