@@ -6,8 +6,16 @@ import (
 	"github.com/astaxie/beego/config"
 )
 
+const (
+	APIVERSION_V1 = iota
+	APIVERSION_V2
+)
+
 var (
-	conf          config.ConfigContainer
+	conf config.ConfigContainer
+)
+
+var (
 	AppName       string
 	Usage         string
 	Version       string
@@ -22,6 +30,7 @@ var (
 	DBPasswd      string
 	DBDB          int64
 	BackendDriver string //Container image storage driver name
+	ImagePath     string
 )
 
 func SetConfig(path string) error {
@@ -104,10 +113,16 @@ func SetConfig(path string) error {
 
 	DBDB, err = conf.Int64("db::db")
 
-	if backenddriver := conf.String("backend::driver"); backenddriver != "" {
+	if backenddriver := conf.String("dockyard::driver"); backenddriver != "" {
 		BackendDriver = backenddriver
 	} else if backenddriver == "" {
-		err = fmt.Errorf("BackendDriver config value is null")
+		err = fmt.Errorf("Backend driver config value is null")
+	}
+
+	if imagepath := conf.String("dockyard::path"); imagepath != "" {
+		ImagePath = imagepath
+	} else if imagepath == "" {
+		err = fmt.Errorf("Image path config value is null")
 	}
 
 	return err
