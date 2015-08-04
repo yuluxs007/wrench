@@ -132,7 +132,7 @@ func SetConfig(path string) error {
 		err = fmt.Errorf("Image path config value is null")
 	}
 
-	if domains := conf.String("dockyard::domain"); domains != "" {
+	if domains := conf.String("dockyard::domains"); domains != "" {
 		Domains = domains
 	} else if domains == "" {
 		err = fmt.Errorf("Domains value is null")
