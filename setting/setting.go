@@ -16,6 +16,7 @@ var (
 )
 
 var (
+	//Global
 	AppName       string
 	Usage         string
 	Version       string
@@ -29,8 +30,10 @@ var (
 	DBURI         string
 	DBPasswd      string
 	DBDB          int64
-	BackendDriver string //Container image storage driver name
+	//Dockyard
+	BackendDriver string
 	ImagePath     string
+	Domains       string
 )
 
 func SetConfig(path string) error {
@@ -113,6 +116,7 @@ func SetConfig(path string) error {
 
 	DBDB, err = conf.Int64("db::db")
 
+	//Dockyard
 	if backenddriver := conf.String("dockyard::driver"); backenddriver != "" {
 		BackendDriver = backenddriver
 	} else if backenddriver == "" {
@@ -123,6 +127,12 @@ func SetConfig(path string) error {
 		ImagePath = imagepath
 	} else if imagepath == "" {
 		err = fmt.Errorf("Image path config value is null")
+	}
+
+	if domains := conf.String("dockyard::domain"); domains != "" {
+		Domains = domains
+	} else if domains == "" {
+		err = fmt.Errorf("Domains value is null")
 	}
 
 	return err
