@@ -31,9 +31,12 @@ var (
 	DBPasswd      string
 	DBDB          int64
 	//Dockyard
-	BackendDriver string
-	ImagePath     string
-	Domains       string
+	BackendDriver       string
+	ImagePath           string
+	Domains             string
+	RegistryVersion     string
+	DistributionVersion string
+	Standalone          string
 )
 
 func SetConfig(path string) error {
@@ -133,6 +136,24 @@ func SetConfig(path string) error {
 		Domains = domains
 	} else if domains == "" {
 		err = fmt.Errorf("Domains value is null")
+	}
+
+	if registryVersion := conf.String("dockyard::registry"); registryVersion != "" {
+		RegistryVersion = registryVersion
+	} else if registryVersion == "" {
+		err = fmt.Errorf("Registry version value is null")
+	}
+
+	if distributionVersion := conf.String("dockyard::distribution"); distributionVersion != "" {
+		DistributionVersion = distributionVersion
+	} else if distributionVersion == "" {
+		err = fmt.Errorf("Distribution version value is null")
+	}
+
+	if standalone := conf.String("dockyard::Standalone"); standalone != "" {
+		Standalone = standalone
+	} else if standalone == "" {
+		err = fmt.Errorf("Standalone version value is null")
 	}
 
 	return err
