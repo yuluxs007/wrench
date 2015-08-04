@@ -150,7 +150,7 @@ func SetConfig(path string) error {
 		err = fmt.Errorf("Distribution version value is null")
 	}
 
-	if standalone := conf.String("dockyard::Standalone"); standalone != "" {
+	if standalone := conf.String("dockyard::standalone"); standalone != "" {
 		Standalone = standalone
 	} else if standalone == "" {
 		err = fmt.Errorf("Standalone version value is null")
