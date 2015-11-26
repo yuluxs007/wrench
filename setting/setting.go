@@ -181,7 +181,7 @@ func SetConfig(path string) error {
 	switch BackendDriver {
 	case "native":
 		//It will be supported soon
-	case "qiniu", "aliyun":
+	case "qiniu", "aliyun","amazons3":
 		if endpoint := conf.String(BackendDriver + "::" + "endpoint"); endpoint != "" {
 			Endpoint = endpoint
 		} else {
@@ -232,8 +232,6 @@ func SetConfig(path string) error {
 		}
 
 	case "qcloud":
-		//It will be supported soon
-	case "amazons3":
 		//It will be supported soon
 	case "googlecloud":
 		//It will be supported soon
