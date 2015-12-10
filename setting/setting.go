@@ -257,7 +257,9 @@ func SetConfig(path string) error {
 
 	ClairDBPath = conf.String("clairDBPath")
 	ClairLogLevel = conf.String("clairLogLevel")
-	ClairKeepDB = conf.Bool("clairKeepDB")
+	if ClairKeepDB, err = conf.Bool("clairKeepDB"); err != nil {
+		ClairKeepDB = false
+	}
 	ClairUpdateDuration = conf.String("clairUpdateDuration")
 	ClairVulnPriority = conf.String("clairVulnPriority")
 
