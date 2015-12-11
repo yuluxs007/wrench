@@ -255,13 +255,11 @@ func SetConfig(path string) error {
 		err = fmt.Errorf("Doesn't support %v now", BackendDriver)
 	}
 
-	ClairDBPath = conf.String("clairDBPath")
-	ClairLogLevel = conf.String("clairLogLevel")
-	if ClairKeepDB, err = conf.Bool("clairKeepDB"); err != nil {
-		ClairKeepDB = false
-	}
-	ClairUpdateDuration = conf.String("clairUpdateDuration")
-	ClairVulnPriority = conf.String("clairVulnPriority")
+	ClairDBPath = conf.String("clair::path")
+	ClairLogLevel = conf.String("clair::logLevel")
+	ClairKeepDB, _ = conf.Bool("clair::keepDB")
+	ClairUpdateDuration = conf.String("clair::updateDuration")
+	ClairVulnPriority = conf.String("clair::vulnPriority")
 
 	return err
 }
