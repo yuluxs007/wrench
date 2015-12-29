@@ -94,6 +94,7 @@ var (
 	DataPath         string
 	ChunkNum         int
 	APIPort          int
+	APIHttpsPort     int
 	PartSizeMB       int
 )
 
@@ -326,6 +327,7 @@ func SetConfig(path string) error {
 		}
 		ChunkNum, err = conf.Int(BackendDriver + "::" + "chunknum")
 		APIPort, err = conf.Int(BackendDriver + "::" + "apiport")
+		APIHttpsPort, err = conf.Int(BackendDriver + "::" + "apihttpsport")
 		PartSizeMB, err = conf.Int(BackendDriver + "::" + "partsizemb")
 	case "googlecloud":
 		//It will be supported soon
