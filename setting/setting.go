@@ -9,6 +9,7 @@ import (
 const (
 	APIVERSION_V1 = iota
 	APIVERSION_V2
+	APIVERSION_ACI
 )
 
 var (
