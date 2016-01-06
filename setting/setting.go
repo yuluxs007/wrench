@@ -37,6 +37,7 @@ var (
 	RegistryVersion     string
 	DistributionVersion string
 	Standalone          string
+	OssSwitch           string
 )
 
 // object storage driver config parameters
@@ -77,25 +78,11 @@ var (
 	ClairVulnPriority string
 )
 
-// Object Storage Service parameters
+// OSS backend driver parameters
 var (
-	OssMode          string
-	MasterHost       string
-	MasterPort       int
-	MetaHost         string
-	MetaPort         string
-	DbUser           string
-	DbPasswd         string
-	Db               string
-	LimitCSNum       int
-	ConnPoolCapacity int
-	Servers          string
-	ErrLogPath       string
-	DataPath         string
-	ChunkNum         int
-	APIPort          int
-	APIHttpsPort     int
-	PartSizeMB       int
+	APIPort      int
+	APIHttpsPort int
+	PartSizeMB   int
 )
 
 func SetConfig(path string) error {
@@ -207,6 +194,11 @@ func SetConfig(path string) error {
 	} else if standalone == "" {
 		err = fmt.Errorf("Standalone version value is null")
 	}
+	if ossswitch := conf.String("dockyard::ossswitch"); ossswitch != "" {
+		OssSwitch = ossswitch
+	} else if ossswitch == "" {
+		OssSwitch = "disable"
+	}
 
 	//Dockyard object storage,default to use dockyard storage
 	BackendDriver = "native"
@@ -271,61 +263,6 @@ func SetConfig(path string) error {
 	case "qcloud":
 	//It will be supported soon
 	case "oss":
-		if ossmode := conf.String(BackendDriver + "::" + "ossmode"); ossmode != "" {
-			OssMode = ossmode
-		} else {
-			OssMode = "allinone"
-		}
-		if masterhost := conf.String(BackendDriver + "::" + "masterhost"); masterhost != "" {
-			MasterHost = masterhost
-		} else {
-			err = fmt.Errorf("masterhost value is null")
-		}
-		MasterPort, err = conf.Int(BackendDriver + "::" + "masterport")
-		if metahost := conf.String(BackendDriver + "::" + "metahost"); metahost != "" {
-			MetaHost = metahost
-		} else {
-			err = fmt.Errorf("metaHost  value is null")
-		}
-		if metaport := conf.String(BackendDriver + "::" + "metaport"); metaport != "" {
-			MetaPort = metaport
-		} else {
-			err = fmt.Errorf("metaport  value is null")
-		}
-
-		if dbuser := conf.String(BackendDriver + "::" + "dbuser"); dbuser != "" {
-			DbUser = dbuser
-		} else {
-			err = fmt.Errorf("dbuser value is null")
-		}
-		if dbpasswd := conf.String(BackendDriver + "::" + "dbpasswd"); dbpasswd != "" {
-			DbPasswd = dbpasswd
-		} else {
-			err = fmt.Errorf("dbpasswd value is null")
-		}
-		if db := conf.String(BackendDriver + "::" + "db"); db != "" {
-			Db = db
-		} else {
-			err = fmt.Errorf("db value is null")
-		}
-		LimitCSNum, err = conf.Int(BackendDriver + "::" + "limitcsnum")
-		ConnPoolCapacity, err = conf.Int(BackendDriver + "::" + "connpoolcapacity")
-		if servers := conf.String(BackendDriver + "::" + "servers"); servers != "" {
-			Servers = servers
-		} else {
-			err = fmt.Errorf("servers value is null")
-		}
-		if errlogpath := conf.String(BackendDriver + "::" + "errlogpath"); errlogpath != "" {
-			ErrLogPath = errlogpath
-		} else {
-			ErrLogPath = "/usr/local/oss/errlog"
-		}
-		if datapath := conf.String(BackendDriver + "::" + "datapath"); datapath != "" {
-			DataPath = datapath
-		} else {
-			DataPath = "/usr/local/oss/data"
-		}
-		ChunkNum, err = conf.Int(BackendDriver + "::" + "chunknum")
 		APIPort, err = conf.Int(BackendDriver + "::" + "apiport")
 		APIHttpsPort, err = conf.Int(BackendDriver + "::" + "apihttpsport")
 		PartSizeMB, err = conf.Int(BackendDriver + "::" + "partsizemb")
