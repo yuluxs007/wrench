@@ -13,7 +13,7 @@ const (
 )
 
 var (
-	conf config.ConfigContainer
+	conf config.Configer
 )
 
 var (
