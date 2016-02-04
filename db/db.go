@@ -1,129 +1,123 @@
 package db
 
 import (
-	"encoding/json"
 	"fmt"
+	"reflect"
 
-	"gopkg.in/redis.v3"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/huawei-openlab/newdb/orm"
 )
 
-const (
-	//Dockyard Data Index
-	GLOBAL_REPOSITORY_INDEX = "GLOBAL_REPOSITORY_INDEX"
-	GLOBAL_IMAGE_INDEX      = "GLOBAL_IMAGE_INDEX"
-	GLOBAL_TARSUM_INDEX     = "GLOBAL_TARSUM_INDEX"
-	GLOBAL_TAG_INDEX        = "GLOBAL_TAG_INDEX"
-	GLOBAL_COMPOSE_INDEX    = "GLOBAL_COMPOSE_INDEX"
-	//Sail Data Index
-	GLOBAL_USER_INDEX         = "GLOBAL_USER_INDEX"
-	GLOBAL_ORGANIZATION_INDEX = "GLOBAL_ORGANIZATION_INDEX"
-	GLOBAL_TEAM_INDEX         = "GLOBAL_TEAM_INDEX"
-	//Wharf Data Index
-	GLOBAL_ADMIN_INDEX = "GLOBAL_ADMIN_INDEX"
-	GLOBAL_LOG_INDEX   = "GLOBAL_LOG_INDEX"
-)
-
-/*
-  [user] : USER-(username)
-	[organization] : ORG-(org)
-	[team] : TEAM-(org)-(team)
-	[repository] : REPO-(namespace)-(repo)
-	[image] : IMAGE-(imageId)
-	[tag] : TAG-(namespace)-(repo)-(tag)
-	[compose] : COMPOSE-(namespace)-(compose)
-	[admin] : ADMIN-(username)
-	[log] : LOG-(object)
-	[lock] : LOCK-(object)
-*/
-
-var (
-	Client *redis.Client
-)
-
-func Key(object string, keys ...string) (result string) {
-	switch object {
-	case "USER":
-	case "user":
-		result = fmt.Sprintf("USER-%s", keys[0])
-	case "ORG":
-	case "ORGANIZATION":
-	case "org":
-	case "organization":
-		result = fmt.Sprintf("ORG-%s", keys[0])
-	case "TEAM":
-	case "team":
-		result = fmt.Sprintf("ORG-%s-%s", keys[0], keys[1])
-	case "REPO":
-	case "REPOSITORY":
-	case "repo":
-	case "repository":
-		result = fmt.Sprintf("REPO-%s-%s", keys[0], keys[1])
-	case "IMAGE":
-	case "image":
-		result = fmt.Sprintf("IMAGE-%s", keys[0])
-	case "TARSUM":
-	case "tarsum":
-		result = fmt.Sprintf("TARSUM-%s", keys[0])
-	case "TAG":
-	case "tag":
-		result = fmt.Sprintf("TAG-%s-%s-%s", keys[0], keys[1], keys[2])
-	case "COMPOSE":
-	case "compose":
-		result = fmt.Sprintf("COMPOSE-%s-%s", keys[0], keys[1])
-	case "ADMIN":
-	case "admin":
-		result = fmt.Sprintf("ADMIN-%s", keys[0])
-	case "LOG":
-	case "log":
-		result = fmt.Sprintf("LOG-%s", keys[0])
-	case "LOCK":
-	case "lock":
-		result = fmt.Sprintf("LOCK-%s", keys[0])
-	default:
-		result = ""
-	}
-
-	return result
+func RegisterModel(models ...interface{}) {
+	orm.RegisterModel(models...)
 }
 
-func InitDB(addr, passwd string, db int64) error {
-	Client = redis.NewClient(&redis.Options{
-		Addr:     addr,
-		Password: passwd,
-		DB:       db,
-	})
-
-	if _, err := Client.Ping().Result(); err != nil {
+func InitDB(driver, user, passwd, uri, name string) error {
+	ds := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", user, passwd, uri, name)
+	if err := orm.RegisterDataBase("default", driver, ds, 0, 0); err != nil {
 		return err
+	}
+
+	if err := orm.RunSyncdb("default", false, false); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Get(obj interface{}, params ...string) (bool, error) {
+	n := len(params)
+	if n <= 0 {
+		return false, fmt.Errorf("No key to query")
+	}
+
+	keys := []string{}
+	s := reflect.ValueOf(obj).Elem()
+	typeOfS := s.Type()
+	for i := 0; i < n; i++ {
+		for k := 0; k < s.NumField(); k++ {
+			f := s.Field(k)
+
+			if f.Interface() == params[i] {
+				keys = append(keys, typeOfS.Field(k).Name)
+				break
+			}
+		}
+	}
+
+	if len(keys) <= 0 {
+		return false, fmt.Errorf("Wrong key to query")
+	}
+
+	o := orm.NewOrm()
+	if err := o.Read(obj, keys...); err != nil {
+		if err == orm.ErrNoRows {
+			return false, nil
+		} else {
+			return false, err
+		}
+	}
+
+	return true, nil
+}
+
+func Save(obj interface{}, params ...string) error {
+	o := orm.NewOrm()
+
+	exists, err := Get(obj, params...)
+	if err != nil {
+		return err
+	}
+
+	if err := o.Begin(); err != nil {
+		return err
+	}
+
+	if !exists {
+		_, err = o.Insert(obj)
 	} else {
-		return nil
+		_, err = o.Update(obj)
 	}
+
+	if err != nil {
+		o.Rollback()
+	} else {
+		o.Commit()
+	}
+
+	return err
 }
 
-func Save(obj interface{}, key string) (err error) {
-	result, err := json.Marshal(&obj)
+func Insert(obj interface{}) error {
+	o := orm.NewOrm()
 
+	err := o.Begin()
 	if err != nil {
 		return err
 	}
 
-	if _, err := Client.Set(key, string(result), 0).Result(); err != nil {
-		return err
+	if _, err := o.Insert(obj); err != nil {
+		o.Rollback()
+	} else {
+		o.Commit()
 	}
 
-	return nil
+	return err
 }
 
-func Get(obj interface{}, key string) (err error) {
-	result, err := Client.Get(key).Result()
+func Update(obj interface{}, params ...string) error {
+	o := orm.NewOrm()
 
+	err := o.Begin()
 	if err != nil {
 		return err
 	}
 
-	if err = json.Unmarshal([]byte(result), &obj); err != nil {
-		return err
+	if _, err := o.Update(obj, params...); err != nil {
+		o.Rollback()
+	} else {
+		o.Commit()
 	}
 
-	return nil
+	return err
 }
