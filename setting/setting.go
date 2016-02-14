@@ -28,9 +28,15 @@ var (
 	HttpsCertFile string
 	HttpsKeyFile  string
 	LogPath       string
-	DBURI         string
-	DBPasswd      string
-	DBDB          int64
+
+	//DB
+	DBDriver string
+	DBUser   string
+	DBPasswd string
+	DBName   string
+	DBURI    string
+	DBDB     int64
+
 	//Dockyard
 	BackendDriver       string
 	ImagePath           string
@@ -94,6 +100,7 @@ func SetConfig(path string) error {
 		return fmt.Errorf("Read %s error: %v", path, err.Error())
 	}
 
+	//config globals
 	if appname := conf.String("appname"); appname != "" {
 		AppName = appname
 	} else if appname == "" {
@@ -154,18 +161,39 @@ func SetConfig(path string) error {
 		err = fmt.Errorf("LogPath config value is null")
 	}
 
-	if dburi := conf.String("db::uri"); dburi != "" {
-		DBURI = dburi
-	} else if dburi == "" {
-		err = fmt.Errorf("DBURI config value is null")
+	//config DB
+	if dbdriver := conf.String("db::driver"); dbdriver != "" {
+		DBDriver = dbdriver
+	} else if dbdriver == "" {
+		err = fmt.Errorf("DB driver config value is null")
+	}
+
+	if dbuser := conf.String("db::user"); dbuser != "" {
+		DBUser = dbuser
+	} else if dbuser == "" {
+		err = fmt.Errorf("DB user config value is null")
 	}
 
 	if dbpass := conf.String("db::passwd"); dbpass != "" {
 		DBPasswd = dbpass
 	}
 
-	DBDB, err = conf.Int64("db::db")
+	if dbname := conf.String("db::name"); dbname != "" {
+		DBName = dbname
+	} else if dbname == "" {
+		err = fmt.Errorf("DB name config value is null")
+	}
 
+	if dburi := conf.String("db::uri"); dburi != "" {
+		DBURI = dburi
+	} else if dburi == "" {
+		err = fmt.Errorf("DB address config value is null")
+	}
+
+	dbpartition, _ := conf.Int64("db::db")
+	DBDB = dbpartition
+
+	//config Dockyard
 	if imagepath := conf.String("dockyard::path"); imagepath != "" {
 		ImagePath = imagepath
 	} else if imagepath == "" {
