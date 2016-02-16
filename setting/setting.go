@@ -164,32 +164,19 @@ func SetConfig(path string) error {
 	//config DB
 	if dbdriver := conf.String("db::driver"); dbdriver != "" {
 		DBDriver = dbdriver
-	} else if dbdriver == "" {
-		err = fmt.Errorf("DB driver config value is null")
 	}
-
+	if dburi := conf.String("db::uri"); dburi != "" {
+		DBURI = dburi
+	}
 	if dbuser := conf.String("db::user"); dbuser != "" {
 		DBUser = dbuser
-	} else if dbuser == "" {
-		err = fmt.Errorf("DB user config value is null")
 	}
-
 	if dbpass := conf.String("db::passwd"); dbpass != "" {
 		DBPasswd = dbpass
 	}
-
 	if dbname := conf.String("db::name"); dbname != "" {
 		DBName = dbname
-	} else if dbname == "" {
-		err = fmt.Errorf("DB name config value is null")
 	}
-
-	if dburi := conf.String("db::uri"); dburi != "" {
-		DBURI = dburi
-	} else if dburi == "" {
-		err = fmt.Errorf("DB address config value is null")
-	}
-
 	dbpartition, _ := conf.Int64("db::db")
 	DBDB = dbpartition
 
