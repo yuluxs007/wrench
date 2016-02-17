@@ -60,13 +60,14 @@ var (
 	Passwd string
 
 	//qcloud unique
-	AccessID string
+	QcloudAccessID string
 
 	//googlecloud unique
-	Projectid      string
-	Scope          string
-	PrivateKeyFile string
-	Clientemail    string
+	Projectid          string
+	Scope              string
+	PrivateKeyFilePath string
+	PrivateKeyFile     string
+	Clientemail        string
 )
 
 // Clair service config parameters
@@ -277,13 +278,75 @@ func SetConfig(path string) error {
 		}
 
 	case "qcloud":
-	//It will be supported soon
+		if endpoint := conf.String(BackendDriver + "::" + "endpoint"); endpoint != "" {
+			Endpoint = endpoint
+		} else {
+			err = fmt.Errorf("Endpoint value is null")
+		}
+
+		if accessID := conf.String(BackendDriver + "::" + "accessID"); accessID != "" {
+			QcloudAccessID = accessID
+		} else {
+			err = fmt.Errorf("accessID value is null")
+		}
+
+		if bucket := conf.String(BackendDriver + "::" + "bucket"); bucket != "" {
+			Bucket = bucket
+		} else {
+			err = fmt.Errorf("Bucket value is null")
+		}
+
+		if accessKeyID := conf.String(BackendDriver + "::" + "accessKeyID"); accessKeyID != "" {
+			AccessKeyID = accessKeyID
+		} else {
+			err = fmt.Errorf("AccessKeyID value is null")
+		}
+
+		if accessKeysecret := conf.String(BackendDriver + "::" + "accessKeysecret"); accessKeysecret != "" {
+			AccessKeysecret = accessKeysecret
+		} else {
+			err = fmt.Errorf("AccessKeysecret value is null")
+		}
 	case "oss":
 		APIPort, err = conf.Int(BackendDriver + "::" + "apiport")
 		APIHttpsPort, err = conf.Int(BackendDriver + "::" + "apihttpsport")
 		PartSizeMB, err = conf.Int(BackendDriver + "::" + "partsizemb")
 	case "googlecloud":
-		//It will be supported soon
+		if projectid := conf.String(BackendDriver + "::" + "projectid"); projectid != "" {
+			Projectid = projectid
+		} else {
+			err = fmt.Errorf("Projectid value is null")
+		}
+
+		if scope := conf.String(BackendDriver + "::" + "scope"); scope != "" {
+			Scope = scope
+		} else {
+			err = fmt.Errorf("Scope value is null")
+		}
+
+		if bucket := conf.String(BackendDriver + "::" + "bucket"); bucket != "" {
+			Bucket = bucket
+		} else {
+			err = fmt.Errorf("Bucket value is null")
+		}
+
+		if keyfilepath := conf.String(BackendDriver + "::" + "keyfilepath"); keyfilepath != "" {
+			PrivateKeyFilePath = keyfilepath
+		} else {
+			err = fmt.Errorf("Privatekey value is null")
+		}
+
+		if privatekey := conf.String(BackendDriver + "::" + "privatekey"); privatekey != "" {
+			PrivateKeyFile = privatekey
+		} else {
+			err = fmt.Errorf("Privatekey value is null")
+		}
+
+		if clientemail := conf.String(BackendDriver + "::" + "clientemail"); clientemail != "" {
+			Clientemail = clientemail
+		} else {
+			err = fmt.Errorf("Clientemail value is null")
+		}
 	default:
 		err = fmt.Errorf("Doesn't support %v now", BackendDriver)
 	}
