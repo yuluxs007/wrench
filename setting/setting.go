@@ -56,8 +56,7 @@ var (
 	AccessKeysecret string
 
 	//upyun unique
-	User   string
-	Passwd string
+	Secret string
 
 	//qcloud unique
 	QcloudAccessID string
@@ -265,16 +264,10 @@ func SetConfig(path string) error {
 			err = fmt.Errorf("Bucket value is null")
 		}
 
-		if user := conf.String(BackendDriver + "::" + "user"); user != "" {
-			User = user
+		if secret := conf.String(BackendDriver + "::" + "secret"); secret != "" {
+			Secret = secret
 		} else {
-			err = fmt.Errorf("User value is null")
-		}
-
-		if passwd := conf.String(BackendDriver + "::" + "passwd"); passwd != "" {
-			Passwd = passwd
-		} else {
-			err = fmt.Errorf("Passwd value is null")
+			err = fmt.Errorf("Secret value is null")
 		}
 
 	case "qcloud":
