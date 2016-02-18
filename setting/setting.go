@@ -164,6 +164,8 @@ func SetConfig(path string) error {
 	//config DB
 	if dbdriver := conf.String("db::driver"); dbdriver != "" {
 		DBDriver = dbdriver
+	} else {
+		err = fmt.Errorf("DB driver config value is null")
 	}
 	if dburi := conf.String("db::uri"); dburi != "" {
 		DBURI = dburi
@@ -217,15 +219,13 @@ func SetConfig(path string) error {
 	}
 
 	//Dockyard object storage,default to use dockyard storage
-	BackendDriver = "native"
 	if backenddriver := conf.String("dockyard::driver"); backenddriver != "" {
 		BackendDriver = backenddriver
 	}
 
 	// TBD: It should be considered to refine the universal config parameters
 	switch BackendDriver {
-	case "native":
-		//It will be supported soon
+	case "":
 	case "qiniu", "aliyun", "amazons3":
 		if endpoint := conf.String(BackendDriver + "::" + "endpoint"); endpoint != "" {
 			Endpoint = endpoint
@@ -250,7 +250,6 @@ func SetConfig(path string) error {
 		} else {
 			err = fmt.Errorf("AccessKeysecret value is null")
 		}
-
 	case "upyun":
 		if endpoint := conf.String(BackendDriver + "::" + "endpoint"); endpoint != "" {
 			Endpoint = endpoint
@@ -269,7 +268,6 @@ func SetConfig(path string) error {
 		} else {
 			err = fmt.Errorf("Secret value is null")
 		}
-
 	case "qcloud":
 		if endpoint := conf.String(BackendDriver + "::" + "endpoint"); endpoint != "" {
 			Endpoint = endpoint
@@ -341,7 +339,7 @@ func SetConfig(path string) error {
 			err = fmt.Errorf("Clientemail value is null")
 		}
 	default:
-		err = fmt.Errorf("Doesn't support %v now", BackendDriver)
+		err = fmt.Errorf("Not support %v", BackendDriver)
 	}
 
 	ClairDBPath = conf.String("clair::path")
