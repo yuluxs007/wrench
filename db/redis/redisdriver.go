@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	client *redis.Client
+	Client *redis.Client
 )
 
 type redisdrv struct{}
@@ -64,13 +64,13 @@ func (r *redisdrv) RegisterModel(models ...interface{}) {
 }
 
 func (r *redisdrv) InitDB(driver, user, passwd, uri, name string, partition int64) error {
-	client = redis.NewClient(&redis.Options{
+	Client = redis.NewClient(&redis.Options{
 		Addr:     uri,
 		Password: passwd,
 		DB:       partition,
 	})
 
-	if _, err := client.Ping().Result(); err != nil {
+	if _, err := Client.Ping().Result(); err != nil {
 		return err
 	} else {
 		return nil
@@ -79,7 +79,7 @@ func (r *redisdrv) InitDB(driver, user, passwd, uri, name string, partition int6
 
 func (r *redisdrv) Get(obj interface{}, params ...string) (bool, error) {
 	key := Key(obj)
-	result, err := client.Get(key).Result()
+	result, err := Client.Get(key).Result()
 	if err != nil {
 		if err == redis.Nil {
 			return false, nil
@@ -102,7 +102,7 @@ func (r *redisdrv) Save(obj interface{}, params ...string) error {
 	}
 
 	key := Key(obj)
-	if _, err := client.Set(key, string(result), 0).Result(); err != nil {
+	if _, err := Client.Set(key, string(result), 0).Result(); err != nil {
 		return err
 	}
 
